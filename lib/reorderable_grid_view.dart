@@ -5,8 +5,10 @@ import 'package:reorderable_grid_view/src/reorderable_wrapper_widget.dart';
 import 'package:reorderable_grid_view/src/reorderable_item.dart';
 
 export 'src/reorderable_sliver_grid_view.dart' show ReorderableSliverGridView;
-export 'src/reorderable_wrapper_widget.dart' show ReorderableWrapperWidget;
+export 'src/reorderable_wrapper_widget.dart';
 export 'src/reorderable_item.dart' show ReorderableItemView;
+export 'src/reorderable_grid_mixin.dart';
+export 'src/reorderable_item.dart';
 
 /// Build the drag widget under finger when dragging.
 /// The index here represents the index of current dragging widget
@@ -21,8 +23,8 @@ class DragWidgetBuilderV2 {
   final bool isScreenshotDragWidget;
 
   /// [screenshot] will not null if you provide isTakeScreenshotDragWidget = ture.
-  final Widget Function(int index, Widget child, ImageProvider? screenshot)
-      builder;
+  final Widget Function(int index, Widget child, ImageProvider? screenshot,
+      Animation<double>? animation) builder;
 
   DragWidgetBuilderV2(
       {this.isScreenshotDragWidget = false, required this.builder});
@@ -33,7 +35,8 @@ class DragWidgetBuilderV2 {
     if (oldBuilder == null) return null;
     return DragWidgetBuilderV2(
         isScreenshotDragWidget: false,
-        builder: (int index, Widget child, ImageProvider? screenshot) =>
+        builder: (int index, Widget child, ImageProvider? screenshot,
+                Animation<double>? animation) =>
             oldBuilder(index, child));
   }
 }

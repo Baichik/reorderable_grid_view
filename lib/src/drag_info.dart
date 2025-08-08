@@ -82,7 +82,8 @@ class DragInfo extends Drag {
     // screenshotKey = item.repaintKey;
 
     // why global to is is zero??
-    zeroOffset = (_getOverlay().context.findRenderObject() as RenderBox).globalToLocal(Offset.zero);
+    zeroOffset = (_getOverlay().context.findRenderObject() as RenderBox)
+        .globalToLocal(Offset.zero);
 
     final RenderBox renderBox = item.context.findRenderObject()! as RenderBox;
     dragOffset = renderBox.globalToLocal(dragPosition);
@@ -90,7 +91,7 @@ class DragInfo extends Drag {
     dragSize = renderBox.size;
 
     // you can not delete !, because in some flutter version is option.
-    scrollable = Scrollable.of(item.context)!;
+    scrollable = Scrollable.of(item.context);
   }
 
   NavigatorState? findNavigator(BuildContext context) {
@@ -111,11 +112,7 @@ class DragInfo extends Drag {
   }
 
   void dispose() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-
-    _proxyAnimationController?.dispose();
-    _proxyAnimationController = null;
+    _proxyAnimationController?.reverse();
   }
 
   Widget createProxy(BuildContext context) {
@@ -130,7 +127,8 @@ class DragInfo extends Drag {
         width: itemSize.width,
         height: itemSize.height,
         child: dragWidgetBuilder != null
-            ? dragWidgetBuilder!.builder(index, child, dragWidgetScreenShot)
+            ? dragWidgetBuilder!.builder(index, child, dragWidgetScreenShot,
+                _proxyAnimationController?.view)
             : Material(
                 elevation: 3.0,
                 child: _defaultDragWidget(context),
@@ -145,10 +143,29 @@ class DragInfo extends Drag {
 
   OverlayState _getOverlay() {
     // you can not delete !, because in some flutter version is option.
-    return overlay?? Overlay.of(context)!;
+    return overlay ?? Overlay.of(context);
   }
 
   void startDrag(ImageProvider? screenshot) {
+    _proxyAnimationController = AnimationController(
+      vsync: tickerProvider,
+      duration: const Duration(milliseconds: 200),
+      reverseDuration: const Duration(milliseconds: 2000),
+    )
+      ..addStatusListener((AnimationStatus status) {
+        if (status == AnimationStatus.dismissed) {
+          _endOrCancel();
+          onEnd?.call(this);
+        }
+        if (status == AnimationStatus.reverse) {
+          _overlayEntry?.remove();
+          _overlayEntry = null;
+
+          _proxyAnimationController?.dispose();
+          _proxyAnimationController = null;
+        }
+      })
+      ..forward();
     readyCallback();
     dragWidgetScreenShot = screenshot;
     _overlayEntry = OverlayEntry(builder: createProxy);
@@ -264,12 +281,15 @@ class DragInfo extends Drag {
   @override
   void end(DragEndDetails details) {
     _endOrCancel();
+
     onEnd?.call(this);
   }
 
   @override
   void cancel() {
     _endOrCancel();
+    _proxyAnimationController?.dispose();
+    _proxyAnimationController = null;
     onCancel?.call(this);
   }
 
@@ -283,7 +303,12 @@ class ScreenshotWidget extends StatefulWidget {
   final DragWidgetReadyCallback dragWidgetCallback;
   final double devicePixelRatio;
 
-  const ScreenshotWidget({Key? key, required this.renderRepaintBoundary, required this.dragWidgetCallback, required this.devicePixelRatio}) : super(key: key);
+  const ScreenshotWidget(
+      {Key? key,
+      required this.renderRepaintBoundary,
+      required this.dragWidgetCallback,
+      required this.devicePixelRatio})
+      : super(key: key);
 
   @override
   State<ScreenshotWidget> createState() => _ScreenshotWidgetState();
@@ -306,7 +331,8 @@ class _ScreenshotWidgetState extends State<ScreenshotWidget> {
       return;
     }
     debug("devicePixelRatio: ${widget.devicePixelRatio}");
-    var image = await widget.renderRepaintBoundary.toImage(pixelRatio: widget.devicePixelRatio);
+    var image = await widget.renderRepaintBoundary
+        .toImage(pixelRatio: widget.devicePixelRatio);
     var byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     widget.dragWidgetCallback();
     setState(() {
@@ -326,5 +352,3 @@ class _ScreenshotWidgetState extends State<ScreenshotWidget> {
     return Image(image: imageProvider!);
   }
 }
-
-

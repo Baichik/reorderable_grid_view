@@ -7,7 +7,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:reorderable_grid_view/src/reorderable_item.dart';
 import 'package:reorderable_grid_view/src/util.dart';
 
 import '../reorderable_grid_view.dart';
@@ -46,7 +45,8 @@ mixin ReorderableGridWidgetMixin on StatefulWidget {
 // So I want my widget to on The ReorderableGridWidgetMixin
 mixin ReorderableGridStateMixin<T extends ReorderableGridWidgetMixin>
     on State<T>, TickerProviderStateMixin<T> {
-  DragEnableConfig get dragEnableConfig => widget.dragEnableConfig ?? (index) => true;
+  DragEnableConfig get dragEnableConfig =>
+      widget.dragEnableConfig ?? (index) => true;
   MultiDragGestureRecognizer? _recognizer;
   GlobalKey<OverlayState> overlayKey = GlobalKey<OverlayState>();
   // late Overlay overlay = Overlay(key: overlayKey);
@@ -133,7 +133,7 @@ mixin ReorderableGridStateMixin<T extends ReorderableGridWidgetMixin>
       // SliverGridGeometry(scrollOffset: 0.0, crossAxisOffset: 140.47619047619048, mainAxisExtent: 217.46031746031747, crossAxisExtent: 130.47619047619048), index: 1
       // SliverGridGeometry(scrollOffset: 227.46031746031747, crossAxisOffset: 0.0, mainAxisExtent: 217.46031746031747, crossAxisExtent: 130.47619047619048), index: 3
       // index is not the right index!!!
-      final fixedIndex = child!.indexInAll?? child.index;
+      final fixedIndex = child!.indexInAll ?? child.index;
       final SliverGridGeometry gridGeometry =
           layout.getGeometryForChildIndex(fixedIndex);
       final rst =
@@ -156,7 +156,6 @@ mixin ReorderableGridStateMixin<T extends ReorderableGridWidgetMixin>
   // Ok, let's no calc the dropIndex
   // Check the dragInfo before you call this function.
   int _calcDropIndex(int defaultIndex) {
-
     if (_dragInfo == null) {
       // _debug("_dragInfo is null, so return: $defaultIndex");
       return defaultIndex;
@@ -222,7 +221,7 @@ mixin ReorderableGridStateMixin<T extends ReorderableGridWidgetMixin>
   }
 
   int _findNextCanDrag(int start) {
-    var max = __items.keys.reduce((a, b) => a > b? a: b);
+    var max = __items.keys.reduce((a, b) => a > b ? a : b);
     for (var i = start + 1; i <= max; i++) {
       if (dragEnableConfig(i)) {
         return i;
@@ -233,12 +232,14 @@ mixin ReorderableGridStateMixin<T extends ReorderableGridWidgetMixin>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.isSliver?? false || !(widget.restrictDragScope?? false)) {
+    if (widget.isSliver ?? false || !(widget.restrictDragScope ?? false)) {
       return widget.child;
     }
     return Stack(children: [
       widget.child,
-      Overlay(key: overlayKey,)
+      Overlay(
+        key: overlayKey,
+      )
     ]);
   }
 
@@ -287,9 +288,10 @@ mixin ReorderableGridStateMixin<T extends ReorderableGridWidgetMixin>
       // should never happen
       return;
     }
-    if (widget.dragWidgetBuilder?.isScreenshotDragWidget?? false) {
+    if (widget.dragWidgetBuilder?.isScreenshotDragWidget ?? false) {
       ui.Image? screenshot = await takeScreenShot(item);
-      ByteData? byteData = await screenshot?.toByteData(format: ui.ImageByteFormat.png);
+      ByteData? byteData =
+          await screenshot?.toByteData(format: ui.ImageByteFormat.png);
       developer.log("screen shot is null: $screenshot, byteData: $byteData");
       if (byteData != null) {
         _dragInfo?.startDrag(MemoryImage(byteData.buffer.asUint8List()));

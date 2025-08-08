@@ -25,25 +25,25 @@ class ReorderableSliverGridView extends StatelessWidget {
   final Duration dragStartDelay;
   final bool dragEnabled;
 
-  const ReorderableSliverGridView({
-    Key? key,
-    this.children = const <Widget>[],
-    required this.crossAxisCount,
-    required this.mainAxisSpacing,
-    required this.crossAxisSpacing,
-    required this.childAspectRatio,
-    required this.onReorder,
-    this.dragWidgetBuilderV2,
-    this.header,
-    this.footer,
-    this.dragStartDelay = kLongPressTimeout,
-    this.scrollSpeedController,
-    this.placeholderBuilder,
-    this.onDragStart,
-    this.onDragUpdate,
-    this.dragEnabled = true,
-    this.dragEnableConfig
-  }) : super(key: key);
+  const ReorderableSliverGridView(
+      {Key? key,
+      this.children = const <Widget>[],
+      required this.crossAxisCount,
+      required this.mainAxisSpacing,
+      required this.crossAxisSpacing,
+      required this.childAspectRatio,
+      required this.onReorder,
+      this.dragWidgetBuilderV2,
+      this.header,
+      this.footer,
+      this.dragStartDelay = kLongPressTimeout,
+      this.scrollSpeedController,
+      this.placeholderBuilder,
+      this.onDragStart,
+      this.onDragUpdate,
+      this.dragEnabled = true,
+      this.dragEnableConfig})
+      : super(key: key);
 
   const ReorderableSliverGridView.count({
     Key? key,
@@ -62,22 +62,21 @@ class ReorderableSliverGridView extends StatelessWidget {
     bool dragEnabled = true,
     DragEnableConfig? dragEnableConfig,
   }) : this(
-          key: key,
-          onReorder: onReorder,
-          children: children,
-          footer: footer,
-          header: header,
-          crossAxisCount: crossAxisCount,
-          dragWidgetBuilderV2: dragWidgetBuilderV2,
-          mainAxisSpacing: mainAxisSpacing,
-          crossAxisSpacing: crossAxisSpacing,
-          childAspectRatio: childAspectRatio,
-          onDragStart: onDragStart,
-          onDragUpdate: onDragUpdate,
-          dragStartDelay: dragStartDelay,
-          dragEnabled: dragEnabled,
-          dragEnableConfig: dragEnableConfig
-        );
+            key: key,
+            onReorder: onReorder,
+            children: children,
+            footer: footer,
+            header: header,
+            crossAxisCount: crossAxisCount,
+            dragWidgetBuilderV2: dragWidgetBuilderV2,
+            mainAxisSpacing: mainAxisSpacing,
+            crossAxisSpacing: crossAxisSpacing,
+            childAspectRatio: childAspectRatio,
+            onDragStart: onDragStart,
+            onDragUpdate: onDragUpdate,
+            dragStartDelay: dragStartDelay,
+            dragEnabled: dragEnabled,
+            dragEnableConfig: dragEnableConfig);
 
   @override
   Widget build(BuildContext context) {
